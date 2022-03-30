@@ -215,6 +215,17 @@ void q_reverse(struct list_head *head)
 {
     if (!head || list_empty(head))
         return;
+
+    struct list_head *li = head->next, *prev, *next;
+    while (li != head) {
+        prev = li->prev, next = li->next;
+        li->prev = next;
+        li->next = prev;
+        li = next;
+    }
+    struct list_head *tmp = head->prev;
+    head->prev = head->next;
+    head->next = tmp;
 }
 
 /*
