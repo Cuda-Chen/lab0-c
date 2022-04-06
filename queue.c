@@ -109,11 +109,11 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
     if (!head || list_empty(head))
         return NULL;
     element_t *ele = list_first_entry(head, element_t, list);
+    list_del(head->next);
     if (sp) {
         strncpy(sp, ele->value, bufsize - 1);
         sp[bufsize - 1] = '\0';
     }
-    list_del(&ele->list);
     return ele;
 }
 
