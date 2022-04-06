@@ -37,6 +37,24 @@ void q_free(struct list_head *l)
 }
 
 /*
+ * New an element for s,
+ * It will allocate memory for s
+ * Return null if allocation failed.
+ */
+static element_t *new_element(char *s)
+{
+    element_t *new_ele = malloc(sizeof(element_t));
+    if (new_ele == NULL)
+        return NULL;
+    new_ele->value = strdup(s);
+    if (new_ele->value == NULL) {
+        free(new_ele);
+        return NULL;
+    }
+    return new_ele;
+}
+
+/*
  * Attempt to insert element at head of queue.
  * Return true if successful.
  * Return false if q is NULL or could not allocate space.
@@ -47,15 +65,9 @@ bool q_insert_head(struct list_head *head, char *s)
 {
     if (!head)
         return false;
-    element_t *ele = (element_t *) malloc(sizeof(element_t));
+    element_t *ele = new_element(s);
     if (!ele)
         return false;
-    ele->value = strdup(s);
-    if (!ele->value) {
-        free(ele);
-        return false;
-    }
-
     list_add(&ele->list, head);
     return true;
 }
@@ -71,16 +83,9 @@ bool q_insert_tail(struct list_head *head, char *s)
 {
     if (!head)
         return false;
-    element_t *ele = (element_t *) malloc(sizeof(element_t));
+    element_t *ele = new_element(s);
     if (!ele)
         return false;
-
-    ele->value = strdup(s);
-    if (!ele->value) {
-        free(ele);
-        return false;
-    }
-
     list_add_tail(&ele->list, head);
     return true;
 }
@@ -120,13 +125,7 @@ element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
 {
     if (!head || list_empty(head))
         return NULL;
-    element_t *ele = list_last_entry(head, element_t, list);
-    if (sp) {
-        strncpy(sp, ele->value, bufsize - 1);
-        sp[bufsize - 1] = '\0';
-    }
-    list_del(&ele->list);
-    return ele;
+    return q_remove_head(head->prev->prev, sp, bufsize);
 }
 
 /*
